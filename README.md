@@ -176,6 +176,13 @@ Scripts for noise robustness, cell dropout, and clone misidentification experime
 
 </details>
 
+## Perturbation Experiment Code
+
+See:
+
+- [Hematopoesis](https://github.com/physics2001/Deep_Lineage/tree/main/Perturbation_On_Hematopoesis)
+- [Reprogramming](https://github.com/physics2001/Deep_Lineage/tree/main/Perturbation_On_Reprogramming)
+
 ## Citation
 
 If you use this code, please cite the accompanying preprint:
