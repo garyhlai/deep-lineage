@@ -188,3 +188,5 @@ CLAUDE.md
 debug_scripts/
 slurm_scripts/
 figure/
+# CoSpar downloads for the real-data analyses
+data_cospar/

@@ -9,6 +9,7 @@ dependencies = [
   "pydantic",
   "scanpy>=1.9.8",
   "scikit-learn",
+  "shap>=0.46",
   "anndata>=0.10",
   "tensorflow>=2.17.0,<2.18.0",
   "h5py>=3.14.0",
