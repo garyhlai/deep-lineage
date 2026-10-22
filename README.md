@@ -116,52 +116,34 @@ uv run python scripts/autoregressive/evaluate_autoregressive_pipeline.py
 
 ## Train on Real Data
 
-### 1. Process data
+`scripts/real_data/` runs Deep Lineage on mouse hematopoiesis (LARRY; Weinreb et al., 2020) and fibroblast-to-iEP reprogramming (CellTagging; Biddy et al., 2018). Both datasets are downloaded through CoSpar on first use. Lineages (clones, or day-0 barcode families for reprogramming) are split into 10 groups; each rotation tests on one group, validates on the next and trains on the rest.
+
+### 1. Build the datasets
 
 ```bash
-uv run python scripts/real_training/generate_reprogramming_dataset.py --mode cumulative
-uv run python scripts/real_training/generate_reprogramming_dataset.py --mode single
+uv run python -m scripts.real_data.prepare_dataset --dataset hematopoiesis
+uv run python -m scripts.real_data.prepare_dataset --dataset reprogramming
 ```
 
-### 2. Validate datasets
+### 2. Train and evaluate each rotation
 
 ```bash
-uv run python scripts/real_training/validate_reprogramming_dataset.py
+for r in 0 1 2 3 4 5 6 7 8 9; do
+  uv run python -m scripts.real_data.run_analyses --dataset hematopoiesis --rotation $r
+  uv run python -m scripts.real_data.run_analyses --dataset reprogramming --rotation $r
+done
 ```
 
-### 3. Train autoencoder
+Add `--fate_only` to run only the fate-prediction analyses.
+
+### 3. Pool the results
 
 ```bash
-uv run python scripts/real_training/train_autoencoder_reprogramming.py \
-    --dataset reprogramming_dataset_cumulative.h5 \
-    --output_dir runs/reprog_ae
+uv run python -m scripts.real_data.summarize --dataset hematopoiesis
+uv run python -m scripts.real_data.summarize --dataset reprogramming
 ```
 
-### 4. Train classifier
-
-```bash
-uv run python scripts/real_training/train_classifier_reprogramming.py \
-    --dataset reprogramming_dataset_cumulative.h5 \
-    --encoder runs/reprog_ae/encoder.keras \
-    --output_dir runs/reprog_cls
-```
-
-### 5. Train regressor
-
-```bash
-uv run python scripts/real_training/train_regressor_reprogramming.py \
-    --dataset reprogramming_dataset_cumulative.h5 \
-    --output_dir runs/reprog_reg
-```
-
-### 6. Evaluate
-
-```bash
-uv run python scripts/real_training/evaluate_reprogramming.py \
-    --ae_dir runs/reprog_ae \
-    --cls_dir runs/reprog_cls \
-    --reg_dir runs/reprog_reg
-```
+Outputs are written to `runs/<dataset>/`.
 
 ---
 
@@ -176,22 +158,26 @@ Scripts for noise robustness, cell dropout, and clone misidentification experime
 
 </details>
 
-## Perturbation Experiment Code
-
-See:
-
-- [Hematopoesis](https://github.com/physics2001/Deep_Lineage/tree/main/Perturbation_On_Hematopoesis)
-- [Reprogramming](https://github.com/physics2001/Deep_Lineage/tree/main/Perturbation_On_Reprogramming)
-
 ## Citation
 
-If you use this code, please cite the accompanying preprint:
+If you use this code, please cite:
+
+Sadria, M., Zhang, A., Lai, H.G., and Bader, G.D. (2026). Deep Lineage: Single-cell lineage tracing and fate inference using deep learning. Cell Systems 17, 101759. https://doi.org/10.1016/j.cels.2026.101759
 
 ```bibtex
-@article{deeplineage2024,
-  title   = {Deep Lineage: Single-Cell Lineage Tracing and Fate Inference Using Deep Learning},
-  year    = {2024},
-  journal = {bioRxiv},
-  doi     = {10.1101/2024.04.25.591126}
+@article{sadria2026deeplineage,
+  author  = {Sadria, Mehrshad and Zhang, Allen and Lai, Haizhi Gary and Bader, Gary D.},
+  title   = {Deep Lineage: Single-cell lineage tracing and fate inference using deep learning},
+  journal = {Cell Systems},
+  volume  = {17},
+  pages   = {101759},
+  year    = {2026},
+  doi     = {10.1016/j.cels.2026.101759}
 }
 ```
+
+An earlier version is available as a preprint: https://doi.org/10.1101/2024.04.25.591126
+
+## License
+
+This code is released under the MIT License; see [LICENSE](LICENSE).
